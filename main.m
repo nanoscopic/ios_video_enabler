@@ -12,34 +12,62 @@ int main(int argc, const char * argv[]) {
         };
         UInt32 allow = 1;
         CMIOObjectSetPropertyData(kCMIOObjectSystemObject, &prop, 0, NULL, sizeof(allow), &allow );
+
+        printf("started\n");
+
+        NSArray<AVMediaType> *device_types = [NSArray arrayWithObjects: AVCaptureDeviceTypeExternalUnknown, nil];
+        AVCaptureDeviceDiscoverySession *session = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:device_types mediaType:AVMediaTypeMuxed position:0];
+        NSArray<AVCaptureDevice *> *devices = [session devices];
+        
+        uint8_t count = [devices count];
+        for (AVCaptureDevice *device in devices) {
+            const char *name = [[device localizedName] UTF8String];
+            const char *id = [[device uniqueID] UTF8String];
+            //index            = [devices count] + [devices_muxed indexOfObject:device];
+            printf("--Device--\n  Name:%s\n  UDID:%s\n", name, id );
+        }
         
         NSNotificationCenter *nCenter = [NSNotificationCenter defaultCenter];
         
         // Setup an observer for newly connected devices
         id observeConnect = [
-                             nCenter addObserverForName:AVCaptureDeviceWasConnectedNotification
-                             object:nil
-                             queue:[NSOperationQueue mainQueue]
-                             usingBlock:^(NSNotification *note)
-                             {
-                                 NSArray *devices = [AVCaptureDevice devices];
-                                 for( AVCaptureDevice *device in devices ) {
-                                     printf("Connected - ID: %s Model: %s\n", [[device uniqueID] UTF8String], [[device modelID] UTF8String]);
-                                 }
-                             }];
+            nCenter addObserverForName:AVCaptureDeviceWasConnectedNotification
+            object:nil
+            queue:[NSOperationQueue mainQueue]
+            usingBlock:^(NSNotification *note)
+        {
+            NSArray<AVMediaType> *device_types = [NSArray arrayWithObjects: AVCaptureDeviceTypeExternalUnknown, nil];
+            AVCaptureDeviceDiscoverySession *session = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:device_types mediaType:AVMediaTypeMuxed position:0];
+            NSArray<AVCaptureDevice *> *devices = [session devices];
+        
+            uint8_t count = [devices count];
+            for (AVCaptureDevice *device in devices) {
+                const char *name = [[device localizedName] UTF8String];
+                const char *id = [[device uniqueID] UTF8String];
+                //index            = [devices count] + [devices_muxed indexOfObject:device];
+                printf("--Device--\n  Name:%s\n  UDID:%s\n", name, id );
+            }
+        }];
         
         // Setup an observer for disconnected devices
         id observeDisconnect = [
-                                nCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification
-                                object:nil
-                                queue:[NSOperationQueue mainQueue]
-                                usingBlock:^(NSNotification *note)
-                                {
-                                    NSArray *devices = [AVCaptureDevice devices];
-                                    for( AVCaptureDevice *device in devices ) {
-                                        printf("Disconnected - ID: %s Model: %s\n", [[device uniqueID] UTF8String], [[device modelID] UTF8String]);
-                                    }
-                                }];
+             nCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification
+             object:nil
+             queue:[NSOperationQueue mainQueue]
+             usingBlock:^(NSNotification *note)
+        {
+            NSArray<AVMediaType> *device_types = [NSArray arrayWithObjects: AVCaptureDeviceTypeExternalUnknown, nil];
+            AVCaptureDeviceDiscoverySession *session = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:device_types mediaType:AVMediaTypeMuxed position:0];
+            NSArray<AVCaptureDevice *> *devices = [session devices];
+        
+            uint8_t count = [devices count];
+            for (AVCaptureDevice *device in devices) {
+                const char *name = [[device localizedName] UTF8String];
+                const char *id = [[device uniqueID] UTF8String];
+                //index            = [devices count] + [devices_muxed indexOfObject:device];
+                printf("--Device--\n  Name:%s\n  UDID:%s\n", name, id );
+            }
+        }];
         
         [[NSRunLoop currentRunLoop] run];
         [nCenter removeObserver:observeConnect];
@@ -47,6 +75,3 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-
-
-
